@@ -5,6 +5,28 @@ function App() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
 
+    // Add these new states at the top of your App function
+  const [newName, setNewName] = useState('');
+  const [newIndustry, setNewIndustry] = useState('');
+
+  const handleAddLead = (e) => {
+    e.preventDefault();
+    const newLead = { name: newName, industry: newIndustry, techStack: "Java", employeeCount: 100, isHiring: true };
+    
+    axios.post("http://localhost:8080/api/leads", newLead)
+      .then(response => {
+        setLeads([...leads, response.data]); // Update the list instantly
+        setNewName('');
+        setNewIndustry('');
+      });
+  };
+
+  const handleDelete = (id) => {
+  axios.delete(`http://localhost:8080/api/leads/${id}`)
+    .then(() => {
+      setLeads(leads.filter(lead => lead.id !== id)); // Remove from UI
+      });
+  };
   useEffect(() => {
     // 1. Make sure Spring Boot is running in IntelliJ on port 8080!
     axios.get("http://localhost:8080/api/leads")
@@ -18,7 +40,7 @@ function App() {
       });
   }, []);
 
-  return (
+return (
     <div style={{ 
       padding: '40px', 
       backgroundColor: '#0f172a', 
@@ -29,6 +51,51 @@ function App() {
       <h1 style={{ color: '#38bdf8', marginBottom: '10px' }}>B2B Lead Intelligence</h1>
       <p style={{ color: '#94a3b8', marginBottom: '30px' }}>Real-time scoring from Spring Boot Backend</p>
       
+      {/* --- ADD NEW LEAD FORM START --- */}
+      <form onSubmit={handleAddLead} style={{ 
+        marginBottom: '40px', 
+        padding: '20px', 
+        backgroundColor: '#1e293b', 
+        borderRadius: '12px',
+        display: 'flex',
+        gap: '10px'
+      }}>
+        <input 
+          style={{ padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#0f172a', color: 'white', flex: 1 }}
+          value={newName} 
+          onChange={e => setNewName(e.target.value)} 
+          placeholder="Company Name" 
+          required 
+        />
+        <input 
+          style={{ padding: '10px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#0f172a', color: 'white', flex: 1 }}
+          value={newIndustry} 
+          onChange={e => setNewIndustry(e.target.value)} 
+          placeholder="Industry (e.g. Tech, Finance)" 
+          required 
+        />
+        <button type="submit" style={{ 
+          padding: '10px 20px', 
+          backgroundColor: '#38bdf8', 
+          color: '#0f172a', 
+          fontWeight: 'bold', 
+          borderRadius: '6px', 
+          border: 'none',
+          cursor: 'pointer'
+        }}>
+          + Add Lead
+        </button>
+      </form>
+      {/* --- ADD NEW LEAD FORM END --- */}
+      {/* --- Delete LEAD FORM END --- */}
+
+      <button 
+      onClick={() => handleDelete(company.id)}
+      style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', padding: '5px 10px', marginLeft: '10px' }}
+    >
+      Delete
+    </button>
+
       {loading ? (
         <p>Loading leads...</p>
       ) : (
