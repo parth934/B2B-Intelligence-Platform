@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+// Live production backend URL on Render
+const API_BASE_URL = "https://lead-engine-backend-il3y.onrender.com/api/leads";
+
 function App() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,17 +24,18 @@ function App() {
       isHiring: true 
     };
     
-    axios.post("http://localhost:8080/api/leads", newLead)
+    axios.post(API_BASE_URL, newLead)
       .then(response => {
         setLeads([...leads, response.data]); 
         setNewName('');
         setNewIndustry('');
-      });
+      })
+      .catch(err => console.error("Could not add lead:", err));
   };
 
   // Handle Deleting a Lead
   const handleDelete = (id) => {
-    axios.delete(`http://localhost:8080/api/leads/${id}`)
+    axios.delete(`${API_BASE_URL}/${id}`)
       .then(() => {
         setLeads(leads.filter(lead => lead.id !== id)); 
       })
@@ -39,7 +43,7 @@ function App() {
   };
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/leads")
+    axios.get(API_BASE_URL)
       .then(response => {
         setLeads(response.data);
         setLoading(false);
@@ -51,8 +55,8 @@ function App() {
   }, []);
 
   const filteredLeads = leads.filter(company => 
-    company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    company.industry.toLowerCase().includes(searchQuery.toLowerCase())
+    company.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    company.industry?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -64,7 +68,7 @@ function App() {
       fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
     }}>
       <h1 style={{ color: '#38bdf8', marginBottom: '10px' }}>B2B Lead Intelligence</h1>
-      <p style={{ color: '#94a3b8', marginBottom: '30px' }}>Real-time scoring from Spring Boot Backend</p>
+      <p style={{ color: '#94a3b8', marginBottom: '30px' }}>Real-time scoring from Live Spring Boot Backend</p>
       
       {/* --- ADD NEW LEAD FORM --- */}
       <form onSubmit={handleAddLead} style={{ 
@@ -123,7 +127,7 @@ function App() {
       {/* --- SEARCH BAR END --- */}
       
       {loading ? (
-        <p>Loading leads...</p>
+        <p>Loading leads from cloud network...</p>
       ) : (
         <div style={{ display: 'grid', gap: '15px' }}>
           {filteredLeads.map((company) => {
