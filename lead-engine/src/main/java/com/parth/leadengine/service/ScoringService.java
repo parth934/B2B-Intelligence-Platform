@@ -2,29 +2,66 @@ package com.parth.leadengine.service;
 
 import com.parth.leadengine.model.Company;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ScoringService {
 
     public int calculateScore(Company company) {
-        int points = 0;
-        if (company.getTechStack() != null &&
-                (company.getTechStack().contains("Java") || company.getTechStack().contains("React"))) {
-            points += 50;
-        }
+        int score = 0;
+        String techStack = company.getTechStack() != null ? company.getTechStack().toLowerCase() : "";
+
+        // 1. Core Base Hiring Signal
         if (company.isHiring()) {
-            points += 30;
+            score += 30;
         }
-        if (company.getEmployeeCount() > 500) {
-            points += 20;
+
+        // 2. Multi-Domain Technology Evaluation Layer
+        boolean matchedTech = false;
+
+        // Enterprise Java Domain
+        if (techStack.contains("java") || techStack.contains("spring")) {
+            score += 20;
+            matchedTech = true;
         }
-        return points;
+
+        // Python & AI/ML Domain
+        if (techStack.contains("python") || techStack.contains("machine learning") || techStack.contains("ai") || techStack.contains("data science")) {
+            score += 25; // Higher premium weight due to high market demand for AI/ML
+            matchedTech = true;
+        }
+
+        // Cloud & DevOps Domain
+        if (techStack.contains("aws") || techStack.contains("azure") || techStack.contains("cloud") || techStack.contains("docker") || techStack.contains("kubernetes")) {
+            score += 20;
+            matchedTech = true;
+        }
+
+        // Database Domain
+        if (techStack.contains("postgres") || techStack.contains("sql") || techStack.contains("database") || techStack.contains("oracle")) {
+            score += 15;
+            matchedTech = true;
+        }
+
+        // Testing & QA Domain
+        if (techStack.contains("testing") || techStack.contains("selenium") || techStack.contains("qa") || techStack.contains("automation testing")) {
+            score += 10;
+            matchedTech = true;
+        }
+
+        // Frontend Web Frameworks
+        if (techStack.contains("react") || techStack.contains("javascript") || techStack.contains("angular")) {
+            score += 10;
+        }
+
+        // Cap the maximum score at 100
+        return Math.min(score, 100);
     }
 
-    // New helper method to determine tier segment
     public String determineStatus(int score) {
-        if (score >= 80) return "HOT";
-        if (score >= 50) return "WARM";
+        if (score >= 70) return "HOT";
+        if (score >= 45) return "WARM";
         return "COLD";
     }
 }
