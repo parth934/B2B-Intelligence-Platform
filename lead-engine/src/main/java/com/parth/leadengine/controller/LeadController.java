@@ -13,7 +13,6 @@ import java.util.List;
 //@CrossOrigin(origins = "http://localhost:3000")
 @CrossOrigin(origins = "*")
 public class LeadController {
-
     private final ScoringService scoringService;
     private final CsvService csvService;
     private final CompanyRepository companyRepository;
